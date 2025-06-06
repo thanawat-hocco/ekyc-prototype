@@ -1,22 +1,24 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-const CameraCapture: React.FC = () => {
+export default function CameraCapture() {
   const navigate = useNavigate();
+
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isCaptured, setIsCaptured] = useState<boolean>(false);
   const [isCameraReady, setIsCameraReady] = useState<boolean>(false);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
 
-  const handleClick = () => {
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // function for navigating back home
+  const handleClickBack = () => {
     // stop camera before go to the next page
     stopCamera();
     navigate('/home');
   };
-
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // stop camera streaming function
   const stopCamera = useCallback(() => {
@@ -54,7 +56,7 @@ const CameraCapture: React.FC = () => {
         };
       }
       setHasPermission(true);
-      console.log('Camera stream started.');
+      // console.log('Camera stream started.');
     } catch (err) {
       console.error('Permission denied or error:', err);
       setHasPermission(false);
@@ -62,16 +64,9 @@ const CameraCapture: React.FC = () => {
     }
   }, [stopCamera]);
 
-  useEffect(() => {
-    startCamera();
-
-    return () => {
-      stopCamera();
-    };
-  }, [startCamera, stopCamera]);
-
+  // function to capture photo
   const capturePhoto = async () => {
-    console.log('capturePhoto called');
+    // console.log('capturePhoto called');
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
@@ -87,7 +82,7 @@ const CameraCapture: React.FC = () => {
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    console.log(`Canvas dimensions set to: ${canvas.width}x${canvas.height}`);
+    // console.log(`Canvas dimensions set to: ${canvas.width}x${canvas.height}`);
 
     const context = canvas.getContext('2d');
     if (context) {
@@ -101,16 +96,26 @@ const CameraCapture: React.FC = () => {
     stopCamera();
 
     const imageUrl = canvas.toDataURL('image/png');
-    console.log(imageUrl);
+    // console.log(imageUrl);
     setImageUrl(imageUrl);
     setIsCaptured(true);
   };
 
+  // function to retake photo
   const retakePhoto = () => {
     setImageUrl(null); // delete image
     setIsCaptured(false); // reset state
     startCamera(); // call starting camera function again
   };
+
+  // --- useEffect ---
+  useEffect(() => {
+    startCamera();
+
+    return () => {
+      stopCamera();
+    };
+  }, [startCamera, stopCamera]);
 
   if (hasPermission === null) {
     return <p>Verifying Camera Access...</p>;
@@ -136,7 +141,7 @@ const CameraCapture: React.FC = () => {
           >
             Take Photo
           </button>
-          <button className="my-2 bg-red-500 hover:bg-red-600 px-8 py-2 font-bold rounded-lg" onClick={handleClick}>
+          <button className="my-2 bg-red-500 hover:bg-red-600 px-8 py-2 font-bold rounded-lg" onClick={handleClickBack}>
             Back
           </button>
         </div>
@@ -157,9 +162,7 @@ const CameraCapture: React.FC = () => {
           </div>
         </div>
       )}
-      <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+      <canvas ref={canvasRef} className="hidden"></canvas>
     </div>
   );
-};
-
-export default CameraCapture;
+}

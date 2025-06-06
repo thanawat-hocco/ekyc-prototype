@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 
-const FailurePage = () => {
+export default function FailurePage() {
   const navigate = useNavigate();
 
   return (
@@ -18,6 +18,4 @@ const FailurePage = () => {
       </button>
     </div>
   );
-};
-
-export default FailurePage;
+}

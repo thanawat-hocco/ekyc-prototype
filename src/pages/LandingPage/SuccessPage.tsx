@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 
-const SuccessPage = () => {
+export default function SuccessPage() {
   const navigate = useNavigate();
 
   return (
@@ -18,6 +18,4 @@ const SuccessPage = () => {
       </button>
     </div>
   );
-};
-
-export default SuccessPage;
+}
